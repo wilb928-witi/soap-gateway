@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  soap-gateway:
+    build: .
+    image: soap-gateway:1.0.0
+    container_name: soap-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - OAUTH2_CLIENT_ID=${OAUTH2_CLIENT_ID}
+      - OAUTH2_CLIENT_SECRET=${OAUTH2_CLIENT_SECRET}
+      - OAUTH2_TOKEN_URI=${OAUTH2_TOKEN_URI}
+    volumes:
+      - ./config:/app/config
+      - ./logs:/app/logs
+    networks:
+      - gateway-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Backend de ejemplo (opcional)
+  mock-backend:
+    image: mockserver/mockserver:latest
+    container_name: mock-backend
+    ports:
+      - "8081:1080"
+    environment:
+      - MOCKSERVER_INITIALIZATION_JSON_PATH=/config/mockserver-init.json
+    networks:
+      - gateway-network
+
+  # Prometheus para métricas (opcional)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    networks:
+      - gateway-network
+
+  # Grafana para visualización (opcional)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana-dashboards:/etc/grafana/provisioning/dashboards
+    networks:
+      - gateway-network
+    depends_on:
+      - prometheus
+
+networks:
+  gateway-network:
+    driver: bridge
+
+volumes:
+  prometheus-data:
+  grafana-data:

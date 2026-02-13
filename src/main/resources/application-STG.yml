@@ -1,0 +1,21 @@
+spring:
+  config:
+    activate:
+      on-profile: STG
+
+logging:
+  level:
+    com.softslim.gateway: INFO
+    org.apache.camel: INFO
+
+bridge-protocols:
+  endpoints-clients:
+    clienteService:
+      rest:
+        domain-path: ${CLIENTE_SERVICE_URL:http://qa-clientes.softslim.com/api/clientes}
+      security:
+        oauth2:
+          token-uri: ${OAUTH2_TOKEN_URI:http://qa-auth.softslim.com/oauth2/token}
+    empleadoService:
+      rest:
+        domain-path: ${EMPLEADO_SERVICE_URL:http://qa-empleados.softslim.com/api/empleados}

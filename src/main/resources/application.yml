@@ -1,0 +1,237 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: soap-gateway
+  config:
+    import: optional:file:.env[.properties]
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+logging:
+  level:
+    com.softslim.gateway: DEBUG
+    org.apache.camel: INFO
+    org.apache.cxf: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+camel:
+  springboot:
+    name: soap-gateway-camel
+    main-run-controller: true
+  component:
+    servlet:
+      mapping:
+        context-path: /camel/*
+
+# Configuración de Bridge Protocols
+bridge-protocols:
+  version: "1.0"
+  endpoints-clients:
+
+    clienteService:
+      version: v1
+      soap-path: /soap/clienteService
+      routing:
+        strategy: operation-name
+
+      rest:
+        domain-path: ${CLIENTE_SERVICE_URL:http://localhost:8081/api/clientes}
+        paths:
+          - id: endpoint1
+            operation: getCliente
+            path: /endpoint1/${header.clienteId}
+            method: GET
+            timeout: 5000
+            headers:
+              Content-Type: application/json
+              Accept: application/json
+
+          - id: endpoint2
+            operation: crearCliente
+            path: /endpoint2
+            method: POST
+            timeout: 8000
+            headers:
+              Content-Type: application/json
+              Accept: application/json
+
+          - id: endpoint3
+            operation: actualizarCliente
+            path: /endpoint1/${header.clienteId}
+            method: PUT
+            timeout: 6000
+            headers:
+              Content-Type: application/json
+
+      security:
+        oauth2:
+          enabled: ${OAUTH2_ENABLED:true}
+          client-id: ${OAUTH2_CLIENT_ID:backend-client}
+          client-secret: ${OAUTH2_CLIENT_SECRET:secret}
+          token-uri: ${OAUTH2_TOKEN_URI:http://localhost:8090/oauth2/token}
+          scope: api.read api.write
+        wsSecurity:
+          enabled: false
+          username: ${WS_SECURITY_USERNAME:}
+          password: ${WS_SECURITY_PASSWORD:}
+        mutualTls:
+          enabled: false
+
+      resilience:
+        retry:
+          enabled: true
+          maxAttempts: 3
+          backoff: 2000
+        circuitBreaker:
+          enabled: true
+          failureRateThreshold: 50
+          waitDurationInOpenState: 10000
+          slidingWindowSize: 10
+
+    empleadoService:
+      version: v1
+      soap-path: /soap/empleadoService
+      routing:
+        strategy: operation-name
+
+      rest:
+        domain-path: ${EMPLEADO_SERVICE_URL:http://localhost:8083/api/empleados}
+        paths:
+          - id: getEmpleado
+            operation: getEmpleado
+            path: /${header.empleadoId}
+            method: GET
+            timeout: 4000
+            headers:
+              Content-Type: application/json
+
+          - id: crearEmpleado
+            operation: crearEmpleado
+            path: /
+            method: POST
+            timeout: 5000
+            headers:
+              Content-Type: application/json
+
+      security:
+        oauth2:
+          enabled: ${OAUTH2_ENABLED:true}
+          client-id: ${OAUTH2_CLIENT_ID:backend-client}
+          client-secret: ${OAUTH2_CLIENT_SECRET:secret}
+          token-uri: ${OAUTH2_TOKEN_URI:http://localhost:8090/oauth2/token}
+        wsSecurity:
+          enabled: false
+        mutualTls:
+          enabled: false
+
+      resilience:
+        retry:
+          enabled: true
+          maxAttempts: 3
+          backoff: 1500
+        circuitBreaker:
+          enabled: true
+          failureRateThreshold: 60
+          waitDurationInOpenState: 8000
+          slidingWindowSize: 10
+
+---
+# Perfil de Desarrollo
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+logging:
+  level:
+    com.softslim.gateway: DEBUG
+    org.apache.camel: DEBUG
+
+bridge-protocols:
+  endpoints-clients:
+    clienteService:
+      rest:
+        domain-path: http://localhost:8081/api/clientes
+      security:
+        oauth2:
+          token-uri: http://localhost:8090/oauth2/token
+    empleadoService:
+      rest:
+        domain-path: http://localhost:8083/api/empleados
+
+---
+# Perfil de QA
+spring:
+  config:
+    activate:
+      on-profile: qa
+
+logging:
+  level:
+    com.softslim.gateway: INFO
+    org.apache.camel: INFO
+
+bridge-protocols:
+  endpoints-clients:
+    clienteService:
+      rest:
+        domain-path: ${CLIENTE_SERVICE_URL:http://qa-clientes.softslim.com/api/clientes}
+      security:
+        oauth2:
+          token-uri: ${OAUTH2_TOKEN_URI:http://qa-auth.softslim.com/oauth2/token}
+    empleadoService:
+      rest:
+        domain-path: ${EMPLEADO_SERVICE_URL:http://qa-empleados.softslim.com/api/empleados}
+
+---
+# Perfil de Producción
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+logging:
+  level:
+    com.softslim.gateway: WARN
+    org.apache.camel: WARN
+
+bridge-protocols:
+  endpoints-clients:
+    clienteService:
+      rest:
+        domain-path: ${CLIENTE_SERVICE_URL:https://clientes.softslim.com/api/clientes}
+      security:
+        oauth2:
+          token-uri: ${OAUTH2_TOKEN_URI:https://auth.softslim.com/oauth2/token}
+      resilience:
+        retry:
+          maxAttempts: 5
+          backoff: 3000
+        circuitBreaker:
+          failureRateThreshold: 30
+          waitDurationInOpenState: 30000
+          slidingWindowSize: 20
+    empleadoService:
+      rest:
+        domain-path: ${EMPLEADO_SERVICE_URL:https://empleados.softslim.com/api/empleados}
+      resilience:
+        retry:
+          maxAttempts: 5
+          backoff: 2500
+        circuitBreaker:
+          failureRateThreshold: 30
+          waitDurationInOpenState: 30000
+          slidingWindowSize: 20

@@ -1,0 +1,40 @@
+# Ignorar archivos de compilación
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# Ignorar archivos IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+
+# Ignorar logs
+logs/
+*.log
+
+# Ignorar archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Ignorar archivos de configuración sensibles
+application-local.yml
+application-dev.yml
+application-prod.yml
+*.env
+
+# Ignorar dependencias de Node (si las hay)
+node_modules/
+
+# Ignorar archivos temporales
+*.tmp
+*.bak
+*.swp
+*~
+/build/
+/src/main/resources/application-LOCALHOST.yml
+/.gradle/
