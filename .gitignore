@@ -38,3 +38,4 @@ node_modules/
 /.gradle/
 !gradle/wrapper/gradle-wrapper.jar
 /.gradle-user-home/
+/bin/
