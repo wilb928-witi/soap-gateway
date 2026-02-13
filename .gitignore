@@ -39,3 +39,4 @@ node_modules/
 /src/main/resources/application-LOCALHOST.yml
 /.gradle/
 !gradle/wrapper/gradle-wrapper.jar
+/.gradle-user-home/
