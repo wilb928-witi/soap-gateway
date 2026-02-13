@@ -23,8 +23,6 @@ Thumbs.db
 
 # Ignorar archivos de configuración sensibles
 application-local.yml
-application-dev.yml
-application-prod.yml
 *.env
 
 # Ignorar dependencias de Node (si las hay)

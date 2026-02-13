@@ -1,7 +1,7 @@
 spring:
   config:
     activate:
-      on-profile: STG
+      on-profile: stg
 
 logging:
   level:
@@ -9,16 +9,45 @@ logging:
     org.apache.camel: INFO
 
 bridge-protocols:
+  version: "1.0"
   endpoints-clients:
     clienteService:
+      version: v1
+      soap-path: /soap/clienteService
+      routing:
+        strategy: operation-name
       rest:
-        domain-path: ${CLIENTE_SERVICE_URL:http://qa-clientes.softslim.com/api/clientes}
+        domain-path: ${CLIENTE_SERVICE_URL:http://stg-clientes.softslim.com/api/clientes}
+        paths:
+          - id: endpoint1
+            operation: getCliente
+            path: /endpoint1/${header.clienteId}
+            method: GET
+            timeout: 5000
+            headers:
+              Content-Type: application/json
+              Accept: application/json
+          - id: endpoint2
+            operation: crearCliente
+            path: /endpoint2
+            method: POST
+            timeout: 8000
+            headers:
+              Content-Type: application/json
+              Accept: application/json
+          - id: endpoint3
+            operation: actualizarCliente
+            path: /endpoint1/${header.clienteId}
+            method: PUT
+            timeout: 6000
+            headers:
+              Content-Type: application/json
       security:
         oauth2:
           enabled: ${STG_OAUTH2_ENABLED:true}
           client-id: ${STG_OAUTH2_CLIENT_ID:backend-client}
           client-secret: ${STG_OAUTH2_CLIENT_SECRET:secret}
-          token-uri: ${OAUTH2_TOKEN_URI:http://qa-auth.softslim.com/oauth2/token}
+          token-uri: ${STG_OAUTH2_TOKEN_URI:http://stg-auth.softslim.com/oauth2/token}
           scope: ${STG_OAUTH2_SCOPE:api.read api.write}
         wsSecurity:
           enabled: ${STG_WS_SECURITY_ENABLED:false}
@@ -30,15 +59,45 @@ bridge-protocols:
           keystore-password: ${STG_TLS_KEYSTORE_PASSWORD:}
           truststore-path: ${STG_TLS_TRUSTSTORE_PATH:}
           truststore-password: ${STG_TLS_TRUSTSTORE_PASSWORD:}
+      resilience:
+        retry:
+          enabled: true
+          maxAttempts: 4
+          backoff: 2500
+        circuitBreaker:
+          enabled: true
+          failureRateThreshold: 40
+          waitDurationInOpenState: 15000
+          slidingWindowSize: 15
+
     empleadoService:
+      version: v1
+      soap-path: /soap/empleadoService
+      routing:
+        strategy: operation-name
       rest:
-        domain-path: ${EMPLEADO_SERVICE_URL:http://qa-empleados.softslim.com/api/empleados}
+        domain-path: ${EMPLEADO_SERVICE_URL:http://stg-empleados.softslim.com/api/empleados}
+        paths:
+          - id: getEmpleado
+            operation: getEmpleado
+            path: /${header.empleadoId}
+            method: GET
+            timeout: 4000
+            headers:
+              Content-Type: application/json
+          - id: crearEmpleado
+            operation: crearEmpleado
+            path: /
+            method: POST
+            timeout: 5000
+            headers:
+              Content-Type: application/json
       security:
         oauth2:
           enabled: ${STG_OAUTH2_ENABLED:true}
           client-id: ${STG_OAUTH2_CLIENT_ID:backend-client}
           client-secret: ${STG_OAUTH2_CLIENT_SECRET:secret}
-          token-uri: ${OAUTH2_TOKEN_URI:http://qa-auth.softslim.com/oauth2/token}
+          token-uri: ${STG_OAUTH2_TOKEN_URI:http://stg-auth.softslim.com/oauth2/token}
           scope: ${STG_OAUTH2_SCOPE:api.read api.write}
         wsSecurity:
           enabled: ${STG_WS_SECURITY_ENABLED:false}
@@ -50,3 +109,13 @@ bridge-protocols:
           keystore-password: ${STG_TLS_KEYSTORE_PASSWORD:}
           truststore-path: ${STG_TLS_TRUSTSTORE_PATH:}
           truststore-password: ${STG_TLS_TRUSTSTORE_PASSWORD:}
+      resilience:
+        retry:
+          enabled: true
+          maxAttempts: 4
+          backoff: 2000
+        circuitBreaker:
+          enabled: true
+          failureRateThreshold: 40
+          waitDurationInOpenState: 15000
+          slidingWindowSize: 15
