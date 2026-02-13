@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project
+    id="9f6229ad-73bb-4b6c-9f7b-43805f4b63d8"
+    activeEnvironment="Default"
+    name="SOAP Gateway Mock Validation"
+    resourceRoot=""
+    soapui-version="5.7.0"
+    abortOnError="false"
+    runType="SEQUENTIAL"
+    xmlns:con="http://eviware.com/soapui/config"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <con:settings/>
+
+  <con:properties>
+    <con:property>
+      <con:name>gatewayBaseUrl</con:name>
+      <con:value>http://localhost:8080</con:value>
+    </con:property>
+    <con:property>
+      <con:name>clienteId</con:name>
+      <con:value>12345</con:value>
+    </con:property>
+    <con:property>
+      <con:name>empleadoId</con:name>
+      <con:value>EMP-100</con:value>
+    </con:property>
+    <con:property>
+      <con:name>channel</con:name>
+      <con:value>MOBILE</con:value>
+    </con:property>
+    <con:property>
+      <con:name>variant</con:name>
+      <con:value>xml-ok</con:value>
+    </con:property>
+  </con:properties>
+
+  <con:interface xsi:type="con:WsdlInterface" id="21536db7-9788-4e30-bec2-adf31c8dd02f" wsaVersion="NONE" name="clienteService" type="wsdl" bindingName="{http://softslim.com/gateway/clienteService}clienteServiceBinding" soapVersion="1_1" anonymous="optional" definition="${#Project#gatewayBaseUrl}/soap/clienteService?wsdl" xmlns:tns="http://softslim.com/gateway/clienteService">
+    <con:settings/>
+    <con:endpoints>
+      <con:endpoint>${#Project#gatewayBaseUrl}/soap/clienteService</con:endpoint>
+    </con:endpoints>
+    <con:operation id="f16ef24c-ab84-4d81-9899-2400e4f0f5de" isOneWay="false" action="getCliente" name="getCliente" bindingOperationName="getCliente" type="Request-Response" outputName="getClienteResponse" inputName="getClienteRequest" receivesAttachments="false" sendsAttachments="false" anonymous="optional">
+      <con:settings/>
+      <con:call id="6fd8ac6f-44fc-4582-9ac2-ce5e1f8f74d2" name="getCliente - default">
+        <con:settings/>
+        <con:request name="Request 1" id="281dc8b0-b4f0-4524-a486-e1f1190e59ec" mediaType="text/xml" xsi:type="con:Request">
+          <con:settings/>
+          <con:endpoint>${#Project#gatewayBaseUrl}/soap/clienteService</con:endpoint>
+          <con:request><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cli="http://softslim.com/gateway/clienteService">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <cli:getCliente>
+      <clienteId>${#Project#clienteId}</clienteId>
+      <header>
+        <channel>${#Project#channel}</channel>
+      </header>
+    </cli:getCliente>
+  </soapenv:Body>
+</soapenv:Envelope>]]></con:request>
+        </con:request>
+      </con:call>
+      <con:call id="fa5ccde9-34f5-43f4-ab0e-21f2e4cc58b0" name="getCliente - variant configurable">
+        <con:settings/>
+        <con:request name="Request 1" id="8fda3e4d-df6f-4d5f-81ca-c7d2f28633ba" mediaType="text/xml" xsi:type="con:Request">
+          <con:settings/>
+          <con:endpoint>${#Project#gatewayBaseUrl}/soap/clienteService</con:endpoint>
+          <con:request><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cli="http://softslim.com/gateway/clienteService">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <cli:getCliente>
+      <clienteId>${#Project#clienteId}</clienteId>
+      <header>
+        <channel>${#Project#channel}</channel>
+        <variant>${#Project#variant}</variant>
+      </header>
+    </cli:getCliente>
+  </soapenv:Body>
+</soapenv:Envelope>]]></con:request>
+        </con:request>
+      </con:call>
+    </con:operation>
+    <con:operation id="98e12c90-df17-4f7b-b5ed-2c0b8eaeb080" isOneWay="false" action="crearCliente" name="crearCliente" bindingOperationName="crearCliente" type="Request-Response" outputName="crearClienteResponse" inputName="crearClienteRequest" receivesAttachments="false" sendsAttachments="false" anonymous="optional">
+      <con:settings/>
+      <con:call id="aef84bb2-3bb5-4c63-aaf8-7a03d39e1607" name="crearCliente">
+        <con:settings/>
+        <con:request name="Request 1" id="9f27679d-d581-4f89-b74b-56c11c7c20d1" mediaType="text/xml" xsi:type="con:Request">
+          <con:settings/>
+          <con:endpoint>${#Project#gatewayBaseUrl}/soap/clienteService</con:endpoint>
+          <con:request><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cli="http://softslim.com/gateway/clienteService">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <cli:crearCliente>
+      <nombre>Cliente SoapUI</nombre>
+      <documento>99999</documento>
+      <header>
+        <variant>${#Project#variant}</variant>
+      </header>
+    </cli:crearCliente>
+  </soapenv:Body>
+</soapenv:Envelope>]]></con:request>
+        </con:request>
+      </con:call>
+    </con:operation>
+    <con:operation id="ef17967a-5f0f-4cb0-a58a-2f95c826ee6b" isOneWay="false" action="actualizarCliente" name="actualizarCliente" bindingOperationName="actualizarCliente" type="Request-Response" outputName="actualizarClienteResponse" inputName="actualizarClienteRequest" receivesAttachments="false" sendsAttachments="false" anonymous="optional">
+      <con:settings/>
+      <con:call id="af644d4f-8991-4667-850f-b0f2db68f442" name="actualizarCliente">
+        <con:settings/>
+        <con:request name="Request 1" id="c6a9c7bc-4386-47ea-89f2-0205f06255ff" mediaType="text/xml" xsi:type="con:Request">
+          <con:settings/>
+          <con:endpoint>${#Project#gatewayBaseUrl}/soap/clienteService</con:endpoint>
+          <con:request><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cli="http://softslim.com/gateway/clienteService">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <cli:actualizarCliente>
+      <clienteId>${#Project#clienteId}</clienteId>
+      <nombre>Cliente Actualizado SoapUI</nombre>
+      <header>
+        <variant>${#Project#variant}</variant>
+      </header>
+    </cli:actualizarCliente>
+  </soapenv:Body>
+</soapenv:Envelope>]]></con:request>
+        </con:request>
+      </con:call>
+    </con:operation>
+  </con:interface>
+
+  <con:interface xsi:type="con:WsdlInterface" id="0193b492-8bad-4609-9bce-f98e7d8da946" wsaVersion="NONE" name="empleadoService" type="wsdl" bindingName="{http://softslim.com/gateway/empleadoService}empleadoServiceBinding" soapVersion="1_1" anonymous="optional" definition="${#Project#gatewayBaseUrl}/soap/empleadoService?wsdl" xmlns:tns="http://softslim.com/gateway/empleadoService">
+    <con:settings/>
+    <con:endpoints>
+      <con:endpoint>${#Project#gatewayBaseUrl}/soap/empleadoService</con:endpoint>
+    </con:endpoints>
+    <con:operation id="63d947f8-8381-43d8-a59c-7bb2e40ef4e6" isOneWay="false" action="getEmpleado" name="getEmpleado" bindingOperationName="getEmpleado" type="Request-Response" outputName="getEmpleadoResponse" inputName="getEmpleadoRequest" receivesAttachments="false" sendsAttachments="false" anonymous="optional">
+      <con:settings/>
+      <con:call id="283f20c8-11b8-42f9-8def-65710d34a1a8" name="getEmpleado">
+        <con:settings/>
+        <con:request name="Request 1" id="3f273c3b-6f8d-4f4e-b46a-3314c4fc66b4" mediaType="text/xml" xsi:type="con:Request">
+          <con:settings/>
+          <con:endpoint>${#Project#gatewayBaseUrl}/soap/empleadoService</con:endpoint>
+          <con:request><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:emp="http://softslim.com/gateway/empleadoService">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <emp:getEmpleado>
+      <empleadoId>${#Project#empleadoId}</empleadoId>
+      <header>
+        <variant>${#Project#variant}</variant>
+      </header>
+    </emp:getEmpleado>
+  </soapenv:Body>
+</soapenv:Envelope>]]></con:request>
+        </con:request>
+      </con:call>
+    </con:operation>
+    <con:operation id="8ec4af61-d327-441f-bcdf-3eddf0c2d31a" isOneWay="false" action="crearEmpleado" name="crearEmpleado" bindingOperationName="crearEmpleado" type="Request-Response" outputName="crearEmpleadoResponse" inputName="crearEmpleadoRequest" receivesAttachments="false" sendsAttachments="false" anonymous="optional">
+      <con:settings/>
+      <con:call id="cd26f71f-5d42-4050-beb8-c3f5b6cb4395" name="crearEmpleado">
+        <con:settings/>
+        <con:request name="Request 1" id="cda5927f-88e6-44bb-b909-6114f0fb7a39" mediaType="text/xml" xsi:type="con:Request">
+          <con:settings/>
+          <con:endpoint>${#Project#gatewayBaseUrl}/soap/empleadoService</con:endpoint>
+          <con:request><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:emp="http://softslim.com/gateway/empleadoService">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <emp:crearEmpleado>
+      <nombre>Empleado SoapUI</nombre>
+      <cargo>QA</cargo>
+      <header>
+        <variant>${#Project#variant}</variant>
+      </header>
+    </emp:crearEmpleado>
+  </soapenv:Body>
+</soapenv:Envelope>]]></con:request>
+        </con:request>
+      </con:call>
+    </con:operation>
+  </con:interface>
+
+</con:soapui-project>
