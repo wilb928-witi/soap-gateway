@@ -1,0 +1,436 @@
+{
+  "info": {
+    "_postman_id": "1c0cd9e9-44c5-4da2-af0f-b3027c1a4a73",
+    "name": "SOAP Gateway - Mock API + Debug Gateway (High Level)",
+    "description": "Colección de alto nivel para validar primero APIs mock (WireMock) y luego el gateway SOAP en modo debug local.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "mock_base_url", "value": "http://localhost:18081" },
+    { "key": "gateway_base_url", "value": "http://localhost:8080" },
+    { "key": "cliente_id", "value": "12345" },
+    { "key": "empleado_id", "value": "EMP-100" },
+    { "key": "channel", "value": "MOBILE" },
+    { "key": "variant", "value": "xml-ok" },
+    { "key": "oauth_client_id", "value": "backend-client" },
+    { "key": "oauth_client_secret", "value": "secret" }
+  ],
+  "item": [
+    {
+      "name": "00. WireMock Admin",
+      "item": [
+        {
+          "name": "Health - GET /__admin",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{mock_base_url}}/__admin",
+              "host": ["{{mock_base_url}}"],
+              "path": ["__admin"]
+            }
+          }
+        },
+        {
+          "name": "Reset Scenarios - POST /__admin/scenarios/reset",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{mock_base_url}}/__admin/scenarios/reset",
+              "host": ["{{mock_base_url}}"],
+              "path": ["__admin", "scenarios", "reset"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "10. Mock ClienteService REST",
+      "item": [
+        {
+          "name": "GET cliente default JSON 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Channel", "value": "{{channel}}" },
+              { "key": "X-Cliente-Id", "value": "{{cliente_id}}" }
+            ],
+            "url": {
+              "raw": "{{mock_base_url}}/api/clientes/endpoint1/{{cliente_id}}",
+              "host": ["{{mock_base_url}}"],
+              "path": ["api", "clientes", "endpoint1", "{{cliente_id}}"]
+            }
+          }
+        },
+        {
+          "name": "GET cliente XML 200 (variant=xml-ok)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Mock-Variant", "value": "xml-ok" },
+              { "key": "X-Channel", "value": "{{channel}}" }
+            ],
+            "url": {
+              "raw": "{{mock_base_url}}/api/clientes/endpoint1/{{cliente_id}}",
+              "host": ["{{mock_base_url}}"],
+              "path": ["api", "clientes", "endpoint1", "{{cliente_id}}"]
+            }
+          }
+        },
+        {
+          "name": "GET cliente TEXT 200 (variant=text-ok)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Mock-Variant", "value": "text-ok" }
+            ],
+            "url": {
+              "raw": "{{mock_base_url}}/api/clientes/endpoint1/{{cliente_id}}",
+              "host": ["{{mock_base_url}}"],
+              "path": ["api", "clientes", "endpoint1", "{{cliente_id}}"]
+            }
+          }
+        },
+        {
+          "name": "GET cliente BINARY 200 (variant=binary-ok)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Mock-Variant", "value": "binary-ok" }
+            ],
+            "url": {
+              "raw": "{{mock_base_url}}/api/clientes/endpoint1/{{cliente_id}}",
+              "host": ["{{mock_base_url}}"],
+              "path": ["api", "clientes", "endpoint1", "{{cliente_id}}"]
+            }
+          }
+        },
+        {
+          "name": "GET cliente JSON malformed 200 (variant=json-malformed)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Mock-Variant", "value": "json-malformed" }
+            ],
+            "url": {
+              "raw": "{{mock_base_url}}/api/clientes/endpoint1/{{cliente_id}}",
+              "host": ["{{mock_base_url}}"],
+              "path": ["api", "clientes", "endpoint1", "{{cliente_id}}"]
+            }
+          }
+        },
+        {
+          "name": "GET cliente 400 JSON (variant=error-400-json)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Mock-Variant", "value": "error-400-json" }
+            ],
+            "url": {
+              "raw": "{{mock_base_url}}/api/clientes/endpoint1/{{cliente_id}}",
+              "host": ["{{mock_base_url}}"],
+              "path": ["api", "clientes", "endpoint1", "{{cliente_id}}"]
+            }
+          }
+        },
+        {
+          "name": "GET cliente 500 TEXT (variant=error-500-text)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Mock-Variant", "value": "error-500-text" }
+            ],
+            "url": {
+              "raw": "{{mock_base_url}}/api/clientes/endpoint1/{{cliente_id}}",
+              "host": ["{{mock_base_url}}"],
+              "path": ["api", "clientes", "endpoint1", "{{cliente_id}}"]
+            }
+          }
+        },
+        {
+          "name": "GET cliente 500 HTML (variant=error-500-html)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Mock-Variant", "value": "error-500-html" }
+            ],
+            "url": {
+              "raw": "{{mock_base_url}}/api/clientes/endpoint1/{{cliente_id}}",
+              "host": ["{{mock_base_url}}"],
+              "path": ["api", "clientes", "endpoint1", "{{cliente_id}}"]
+            }
+          }
+        },
+        {
+          "name": "GET cliente timeout 504+delay (variant=timeout)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Mock-Variant", "value": "timeout" }
+            ],
+            "url": {
+              "raw": "{{mock_base_url}}/api/clientes/endpoint1/{{cliente_id}}",
+              "host": ["{{mock_base_url}}"],
+              "path": ["api", "clientes", "endpoint1", "{{cliente_id}}"]
+            }
+          }
+        },
+        {
+          "name": "GET cliente retry scenario (variant=retry-then-ok)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Mock-Variant", "value": "retry-then-ok" }
+            ],
+            "url": {
+              "raw": "{{mock_base_url}}/api/clientes/endpoint1/{{cliente_id}}",
+              "host": ["{{mock_base_url}}"],
+              "path": ["api", "clientes", "endpoint1", "{{cliente_id}}"]
+            },
+            "description": "Ejecutar 3 veces seguidas tras reset de escenarios: 500, 500, 200"
+          }
+        },
+        {
+          "name": "POST crearCliente 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Cliente Postman\",\n  \"documento\": \"99999\"\n}"
+            },
+            "url": {
+              "raw": "{{mock_base_url}}/api/clientes/endpoint2",
+              "host": ["{{mock_base_url}}"],
+              "path": ["api", "clientes", "endpoint2"]
+            }
+          }
+        },
+        {
+          "name": "POST crearCliente 422 (variant=error-422-json)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Mock-Variant", "value": "error-422-json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{mock_base_url}}/api/clientes/endpoint2",
+              "host": ["{{mock_base_url}}"],
+              "path": ["api", "clientes", "endpoint2"]
+            }
+          }
+        },
+        {
+          "name": "PUT actualizarCliente 200",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Cliente Actualizado\"\n}"
+            },
+            "url": {
+              "raw": "{{mock_base_url}}/api/clientes/endpoint1/{{cliente_id}}",
+              "host": ["{{mock_base_url}}"],
+              "path": ["api", "clientes", "endpoint1", "{{cliente_id}}"]
+            }
+          }
+        },
+        {
+          "name": "PUT actualizarCliente 204 (variant=no-content)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Mock-Variant", "value": "no-content" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Cliente Actualizado\"\n}"
+            },
+            "url": {
+              "raw": "{{mock_base_url}}/api/clientes/endpoint1/{{cliente_id}}",
+              "host": ["{{mock_base_url}}"],
+              "path": ["api", "clientes", "endpoint1", "{{cliente_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "20. Mock EmpleadoService REST",
+      "item": [
+        {
+          "name": "GET empleado default JSON 200",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{mock_base_url}}/api/empleados/{{empleado_id}}",
+              "host": ["{{mock_base_url}}"],
+              "path": ["api", "empleados", "{{empleado_id}}"]
+            }
+          }
+        },
+        {
+          "name": "GET empleado 404 TEXT (variant=error-404-text)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Mock-Variant", "value": "error-404-text" }
+            ],
+            "url": {
+              "raw": "{{mock_base_url}}/api/empleados/{{empleado_id}}",
+              "host": ["{{mock_base_url}}"],
+              "path": ["api", "empleados", "{{empleado_id}}"]
+            }
+          }
+        },
+        {
+          "name": "POST crearEmpleado 201 XML",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Empleado Postman\",\n  \"cargo\": \"QA\"\n}"
+            },
+            "url": {
+              "raw": "{{mock_base_url}}/api/empleados/",
+              "host": ["{{mock_base_url}}"],
+              "path": ["api", "empleados", ""]
+            }
+          }
+        },
+        {
+          "name": "POST crearEmpleado 409 JSON (variant=error-409-json)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Mock-Variant", "value": "error-409-json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Empleado Duplicado\"\n}"
+            },
+            "url": {
+              "raw": "{{mock_base_url}}/api/empleados/",
+              "host": ["{{mock_base_url}}"],
+              "path": ["api", "empleados", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "30. Mock OAuth2",
+      "item": [
+        {
+          "name": "POST token",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/x-www-form-urlencoded" }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "grant_type", "value": "client_credentials", "type": "text" },
+                { "key": "client_id", "value": "{{oauth_client_id}}", "type": "text" },
+                { "key": "client_secret", "value": "{{oauth_client_secret}}", "type": "text" },
+                { "key": "scope", "value": "api.read api.write", "type": "text" }
+              ]
+            },
+            "url": {
+              "raw": "{{mock_base_url}}/oauth2/token",
+              "host": ["{{mock_base_url}}"],
+              "path": ["oauth2", "token"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "90. SOAP Gateway Debug (Opcional)",
+      "item": [
+        {
+          "name": "WSDL clienteService",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{gateway_base_url}}/soap/clienteService?wsdl",
+              "host": ["{{gateway_base_url}}"],
+              "path": ["soap", "clienteService"],
+              "query": [
+                { "key": "wsdl", "value": "" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "WSDL empleadoService",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{gateway_base_url}}/soap/empleadoService?wsdl",
+              "host": ["{{gateway_base_url}}"],
+              "path": ["soap", "empleadoService"],
+              "query": [
+                { "key": "wsdl", "value": "" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "SOAP getCliente (usa header.variant)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "text/xml" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:cli=\"http://softslim.com/gateway/clienteService\">\n  <soapenv:Header/>\n  <soapenv:Body>\n    <cli:getCliente>\n      <clienteId>{{cliente_id}}</clienteId>\n      <header>\n        <channel>{{channel}}</channel>\n        <variant>{{variant}}</variant>\n      </header>\n    </cli:getCliente>\n  </soapenv:Body>\n</soapenv:Envelope>"
+            },
+            "url": {
+              "raw": "{{gateway_base_url}}/soap/clienteService",
+              "host": ["{{gateway_base_url}}"],
+              "path": ["soap", "clienteService"]
+            }
+          }
+        },
+        {
+          "name": "SOAP crearEmpleado",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "text/xml" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:emp=\"http://softslim.com/gateway/empleadoService\">\n  <soapenv:Header/>\n  <soapenv:Body>\n    <emp:crearEmpleado>\n      <nombre>Empleado SOAP</nombre>\n      <cargo>QA</cargo>\n      <header>\n        <variant>{{variant}}</variant>\n      </header>\n    </emp:crearEmpleado>\n  </soapenv:Body>\n</soapenv:Envelope>"
+            },
+            "url": {
+              "raw": "{{gateway_base_url}}/soap/empleadoService",
+              "host": ["{{gateway_base_url}}"],
+              "path": ["soap", "empleadoService"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
