@@ -38,6 +38,10 @@ dependencies {
     implementation "org.apache.camel.springboot:camel-spring-boot-starter:${camelVersion}"
     implementation "org.apache.camel:camel-jackson:${camelVersion}"
     implementation "org.apache.camel:camel-direct:${camelVersion}"
+    implementation "org.apache.camel.springboot:camel-servlet-starter:${camelVersion}"
+    implementation "org.apache.camel.springboot:camel-http-starter:${camelVersion}"
+    implementation "io.github.resilience4j:resilience4j-retry:2.2.0"
+    implementation "io.github.resilience4j:resilience4j-circuitbreaker:2.2.0"
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'
@@ -45,6 +49,7 @@ dependencies {
 
     // Testing
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'com.squareup.okhttp3:mockwebserver:4.12.0'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
@@ -55,4 +60,3 @@ tasks.named('test') {
 bootJar {
     archiveFileName = 'soap-gateway-1.0.0.jar'
 }
-

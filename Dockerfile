@@ -15,12 +15,11 @@ RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 # Directorio de trabajo
 WORKDIR /app
 
-# Copiar JAR
-COPY target/soap-gateway-1.0.0.jar app.jar
+# Copiar JAR (build Gradle)
+COPY build/libs/soap-gateway-1.0.0.jar app.jar
 
 # Copiar configuración
 COPY src/main/resources/application.yml application.yml
-COPY src/main/resources/bridge-protocols.yml bridge-protocols.yml
 
 # Cambiar permisos
 RUN chown -R appuser:appgroup /app

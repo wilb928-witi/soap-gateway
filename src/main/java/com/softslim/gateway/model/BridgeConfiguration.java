@@ -4,7 +4,6 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.util.Map;
 
@@ -18,6 +17,8 @@ public class BridgeConfiguration {
     
     @Valid
     private Map<String, EndpointClient> endpointsClients;
+
+    private Resilience globalResilience;
     
     @Data
     public static class EndpointClient {
@@ -48,6 +49,7 @@ public class BridgeConfiguration {
         private String method;
         private Integer timeout = 5000;
         private Map<String, String> headers;
+        private Resilience resilience;
     }
     
     @Data
@@ -78,6 +80,8 @@ public class BridgeConfiguration {
         private boolean enabled = false;
         private String keystorePath;
         private String keystorePassword;
+        private String truststorePath;
+        private String truststorePassword;
     }
     
     @Data
@@ -97,5 +101,7 @@ public class BridgeConfiguration {
     public static class CircuitBreakerConfig {
         private boolean enabled = false;
         private int failureRateThreshold = 50;
+        private long waitDurationInOpenState = 10000;
+        private int slidingWindowSize = 10;
     }
 }

@@ -21,7 +21,7 @@ public class JsonToXmlProcessor implements Processor {
         
         try {
             JsonNode jsonNode = objectMapper.readTree(jsonResponse);
-            String xmlResponse = convertJsonToXml(jsonNode);
+            String xmlResponse = convertJsonToXmlFragment(jsonNode);
             
             exchange.getIn().setBody(xmlResponse);
             exchange.getIn().setHeader(Exchange.CONTENT_TYPE, "text/xml");
@@ -32,12 +32,11 @@ public class JsonToXmlProcessor implements Processor {
         }
     }
 
-    private String convertJsonToXml(JsonNode jsonNode) {
+    private String convertJsonToXmlFragment(JsonNode jsonNode) {
         StringBuilder xml = new StringBuilder();
-        xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-        xml.append("<response>");
+        xml.append("<result>");
         buildXmlFromJson(jsonNode, xml);
-        xml.append("</response>");
+        xml.append("</result>");
         return xml.toString();
     }
 
@@ -46,9 +45,10 @@ public class JsonToXmlProcessor implements Processor {
             node.fields().forEachRemaining(entry -> {
                 String key = entry.getKey();
                 JsonNode value = entry.getValue();
-                xml.append("<").append(key).append(">");
+                String xmlTag = sanitizeXmlElementName(key);
+                xml.append("<").append(xmlTag).append(">");
                 buildXmlFromJson(value, xml);
-                xml.append("</").append(key).append(">");
+                xml.append("</").append(xmlTag).append(">");
             });
         } else if (node.isArray()) {
             node.forEach(item -> {
@@ -57,7 +57,29 @@ public class JsonToXmlProcessor implements Processor {
                 xml.append("</item>");
             });
         } else {
-            xml.append(node.asText());
+            xml.append(escapeXml(node.asText()));
         }
+    }
+
+    private String escapeXml(String value) {
+        return value
+            .replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+            .replace("\"", "&quot;")
+            .replace("'", "&apos;");
+    }
+
+    private String sanitizeXmlElementName(String rawName) {
+        if (rawName == null || rawName.isBlank()) {
+            return "field";
+        }
+
+        String sanitized = rawName.replaceAll("[^A-Za-z0-9_\\-\\.]", "_");
+        char first = sanitized.charAt(0);
+        if (!Character.isLetter(first) && first != '_') {
+            sanitized = "_" + sanitized;
+        }
+        return sanitized;
     }
 }

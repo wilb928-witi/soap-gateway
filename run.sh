@@ -24,7 +24,11 @@ echo ""
 
 # Compilar proyecto
 echo "Compilando proyecto con Gradle..."
-./gradlew clean build -x test
+if [ -x "./gradlew" ]; then
+    ./gradlew clean build -x test
+else
+    gradle clean build -x test
+fi
 
 if [ $? -ne 0 ]; then
     echo "❌ Error al compilar el proyecto"
@@ -41,4 +45,3 @@ echo "================================"
 echo ""
 
 java -jar build/libs/soap-gateway-1.0.0.jar
-

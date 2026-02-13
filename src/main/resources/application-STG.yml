@@ -15,7 +15,38 @@ bridge-protocols:
         domain-path: ${CLIENTE_SERVICE_URL:http://qa-clientes.softslim.com/api/clientes}
       security:
         oauth2:
+          enabled: ${STG_OAUTH2_ENABLED:true}
+          client-id: ${STG_OAUTH2_CLIENT_ID:backend-client}
+          client-secret: ${STG_OAUTH2_CLIENT_SECRET:secret}
           token-uri: ${OAUTH2_TOKEN_URI:http://qa-auth.softslim.com/oauth2/token}
+          scope: ${STG_OAUTH2_SCOPE:api.read api.write}
+        wsSecurity:
+          enabled: ${STG_WS_SECURITY_ENABLED:false}
+          username: ${STG_WS_SECURITY_USERNAME:}
+          password: ${STG_WS_SECURITY_PASSWORD:}
+        mutualTls:
+          enabled: ${STG_MUTUAL_TLS_ENABLED:false}
+          keystore-path: ${STG_TLS_KEYSTORE_PATH:}
+          keystore-password: ${STG_TLS_KEYSTORE_PASSWORD:}
+          truststore-path: ${STG_TLS_TRUSTSTORE_PATH:}
+          truststore-password: ${STG_TLS_TRUSTSTORE_PASSWORD:}
     empleadoService:
       rest:
         domain-path: ${EMPLEADO_SERVICE_URL:http://qa-empleados.softslim.com/api/empleados}
+      security:
+        oauth2:
+          enabled: ${STG_OAUTH2_ENABLED:true}
+          client-id: ${STG_OAUTH2_CLIENT_ID:backend-client}
+          client-secret: ${STG_OAUTH2_CLIENT_SECRET:secret}
+          token-uri: ${OAUTH2_TOKEN_URI:http://qa-auth.softslim.com/oauth2/token}
+          scope: ${STG_OAUTH2_SCOPE:api.read api.write}
+        wsSecurity:
+          enabled: ${STG_WS_SECURITY_ENABLED:false}
+          username: ${STG_WS_SECURITY_USERNAME:}
+          password: ${STG_WS_SECURITY_PASSWORD:}
+        mutualTls:
+          enabled: ${STG_MUTUAL_TLS_ENABLED:false}
+          keystore-path: ${STG_TLS_KEYSTORE_PATH:}
+          keystore-password: ${STG_TLS_KEYSTORE_PASSWORD:}
+          truststore-path: ${STG_TLS_TRUSTSTORE_PATH:}
+          truststore-password: ${STG_TLS_TRUSTSTORE_PASSWORD:}

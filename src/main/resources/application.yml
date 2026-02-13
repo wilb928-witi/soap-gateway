@@ -31,14 +31,23 @@ camel:
   springboot:
     name: soap-gateway-camel
     main-run-controller: true
-  component:
-    servlet:
-      mapping:
-        context-path: /camel/*
+  servlet:
+    mapping:
+      context-path: /*
 
 # Configuración de Bridge Protocols
 bridge-protocols:
   version: "1.0"
+  global-resilience:
+    retry:
+      enabled: false
+      maxAttempts: 3
+      backoff: 1000
+    circuitBreaker:
+      enabled: false
+      failureRateThreshold: 50
+      waitDurationInOpenState: 10000
+      slidingWindowSize: 10
   endpoints-clients:
 
     clienteService:
@@ -167,10 +176,41 @@ bridge-protocols:
         domain-path: http://localhost:8081/api/clientes
       security:
         oauth2:
+          enabled: ${DEV_OAUTH2_ENABLED:false}
+          client-id: ${DEV_OAUTH2_CLIENT_ID:backend-client}
+          client-secret: ${DEV_OAUTH2_CLIENT_SECRET:secret}
           token-uri: http://localhost:8090/oauth2/token
+          scope: ${DEV_OAUTH2_SCOPE:api.read api.write}
+        wsSecurity:
+          enabled: ${DEV_WS_SECURITY_ENABLED:false}
+          username: ${DEV_WS_SECURITY_USERNAME:}
+          password: ${DEV_WS_SECURITY_PASSWORD:}
+        mutualTls:
+          enabled: ${DEV_MUTUAL_TLS_ENABLED:false}
+          keystore-path: ${DEV_TLS_KEYSTORE_PATH:}
+          keystore-password: ${DEV_TLS_KEYSTORE_PASSWORD:}
+          truststore-path: ${DEV_TLS_TRUSTSTORE_PATH:}
+          truststore-password: ${DEV_TLS_TRUSTSTORE_PASSWORD:}
     empleadoService:
       rest:
         domain-path: http://localhost:8083/api/empleados
+      security:
+        oauth2:
+          enabled: ${DEV_OAUTH2_ENABLED:false}
+          client-id: ${DEV_OAUTH2_CLIENT_ID:backend-client}
+          client-secret: ${DEV_OAUTH2_CLIENT_SECRET:secret}
+          token-uri: http://localhost:8090/oauth2/token
+          scope: ${DEV_OAUTH2_SCOPE:api.read api.write}
+        wsSecurity:
+          enabled: ${DEV_WS_SECURITY_ENABLED:false}
+          username: ${DEV_WS_SECURITY_USERNAME:}
+          password: ${DEV_WS_SECURITY_PASSWORD:}
+        mutualTls:
+          enabled: ${DEV_MUTUAL_TLS_ENABLED:false}
+          keystore-path: ${DEV_TLS_KEYSTORE_PATH:}
+          keystore-password: ${DEV_TLS_KEYSTORE_PASSWORD:}
+          truststore-path: ${DEV_TLS_TRUSTSTORE_PATH:}
+          truststore-password: ${DEV_TLS_TRUSTSTORE_PASSWORD:}
 
 ---
 # Perfil de QA
@@ -191,10 +231,41 @@ bridge-protocols:
         domain-path: ${CLIENTE_SERVICE_URL:http://qa-clientes.softslim.com/api/clientes}
       security:
         oauth2:
+          enabled: ${QA_OAUTH2_ENABLED:true}
+          client-id: ${QA_OAUTH2_CLIENT_ID:backend-client}
+          client-secret: ${QA_OAUTH2_CLIENT_SECRET:secret}
           token-uri: ${OAUTH2_TOKEN_URI:http://qa-auth.softslim.com/oauth2/token}
+          scope: ${QA_OAUTH2_SCOPE:api.read api.write}
+        wsSecurity:
+          enabled: ${QA_WS_SECURITY_ENABLED:false}
+          username: ${QA_WS_SECURITY_USERNAME:}
+          password: ${QA_WS_SECURITY_PASSWORD:}
+        mutualTls:
+          enabled: ${QA_MUTUAL_TLS_ENABLED:false}
+          keystore-path: ${QA_TLS_KEYSTORE_PATH:}
+          keystore-password: ${QA_TLS_KEYSTORE_PASSWORD:}
+          truststore-path: ${QA_TLS_TRUSTSTORE_PATH:}
+          truststore-password: ${QA_TLS_TRUSTSTORE_PASSWORD:}
     empleadoService:
       rest:
         domain-path: ${EMPLEADO_SERVICE_URL:http://qa-empleados.softslim.com/api/empleados}
+      security:
+        oauth2:
+          enabled: ${QA_OAUTH2_ENABLED:true}
+          client-id: ${QA_OAUTH2_CLIENT_ID:backend-client}
+          client-secret: ${QA_OAUTH2_CLIENT_SECRET:secret}
+          token-uri: ${OAUTH2_TOKEN_URI:http://qa-auth.softslim.com/oauth2/token}
+          scope: ${QA_OAUTH2_SCOPE:api.read api.write}
+        wsSecurity:
+          enabled: ${QA_WS_SECURITY_ENABLED:false}
+          username: ${QA_WS_SECURITY_USERNAME:}
+          password: ${QA_WS_SECURITY_PASSWORD:}
+        mutualTls:
+          enabled: ${QA_MUTUAL_TLS_ENABLED:false}
+          keystore-path: ${QA_TLS_KEYSTORE_PATH:}
+          keystore-password: ${QA_TLS_KEYSTORE_PASSWORD:}
+          truststore-path: ${QA_TLS_TRUSTSTORE_PATH:}
+          truststore-password: ${QA_TLS_TRUSTSTORE_PASSWORD:}
 
 ---
 # Perfil de Producción
@@ -215,7 +286,21 @@ bridge-protocols:
         domain-path: ${CLIENTE_SERVICE_URL:https://clientes.softslim.com/api/clientes}
       security:
         oauth2:
+          enabled: ${PROD_OAUTH2_ENABLED:true}
+          client-id: ${PROD_OAUTH2_CLIENT_ID:backend-client}
+          client-secret: ${PROD_OAUTH2_CLIENT_SECRET:secret}
           token-uri: ${OAUTH2_TOKEN_URI:https://auth.softslim.com/oauth2/token}
+          scope: ${PROD_OAUTH2_SCOPE:api.read api.write}
+        wsSecurity:
+          enabled: ${PROD_WS_SECURITY_ENABLED:true}
+          username: ${PROD_WS_SECURITY_USERNAME:}
+          password: ${PROD_WS_SECURITY_PASSWORD:}
+        mutualTls:
+          enabled: ${PROD_MUTUAL_TLS_ENABLED:false}
+          keystore-path: ${PROD_TLS_KEYSTORE_PATH:}
+          keystore-password: ${PROD_TLS_KEYSTORE_PASSWORD:}
+          truststore-path: ${PROD_TLS_TRUSTSTORE_PATH:}
+          truststore-password: ${PROD_TLS_TRUSTSTORE_PASSWORD:}
       resilience:
         retry:
           maxAttempts: 5
@@ -227,6 +312,23 @@ bridge-protocols:
     empleadoService:
       rest:
         domain-path: ${EMPLEADO_SERVICE_URL:https://empleados.softslim.com/api/empleados}
+      security:
+        oauth2:
+          enabled: ${PROD_OAUTH2_ENABLED:true}
+          client-id: ${PROD_OAUTH2_CLIENT_ID:backend-client}
+          client-secret: ${PROD_OAUTH2_CLIENT_SECRET:secret}
+          token-uri: ${OAUTH2_TOKEN_URI:https://auth.softslim.com/oauth2/token}
+          scope: ${PROD_OAUTH2_SCOPE:api.read api.write}
+        wsSecurity:
+          enabled: ${PROD_WS_SECURITY_ENABLED:true}
+          username: ${PROD_WS_SECURITY_USERNAME:}
+          password: ${PROD_WS_SECURITY_PASSWORD:}
+        mutualTls:
+          enabled: ${PROD_MUTUAL_TLS_ENABLED:false}
+          keystore-path: ${PROD_TLS_KEYSTORE_PATH:}
+          keystore-password: ${PROD_TLS_KEYSTORE_PASSWORD:}
+          truststore-path: ${PROD_TLS_TRUSTSTORE_PATH:}
+          truststore-password: ${PROD_TLS_TRUSTSTORE_PASSWORD:}
       resilience:
         retry:
           maxAttempts: 5

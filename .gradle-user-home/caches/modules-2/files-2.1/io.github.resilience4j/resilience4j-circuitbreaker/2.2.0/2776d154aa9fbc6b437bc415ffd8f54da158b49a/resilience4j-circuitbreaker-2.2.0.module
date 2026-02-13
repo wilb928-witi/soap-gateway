@@ -1,0 +1,85 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "io.github.resilience4j",
+    "module": "resilience4j-circuitbreaker",
+    "version": "2.2.0",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "7.4.2"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "dependencies": [
+        {
+          "group": "io.github.resilience4j",
+          "module": "resilience4j-core",
+          "version": {
+            "requires": "2.2.0"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "resilience4j-circuitbreaker-2.2.0.jar",
+          "url": "resilience4j-circuitbreaker-2.2.0.jar",
+          "size": 83023,
+          "sha512": "171eb0106c54ab6d6b5344378c6a2c48e065bb695db0e978212fdab8074c20f7d119b33e6b27a4567f904f57fe255e7f225befd672a1a65df569f1f2a58eb444",
+          "sha256": "b87b0de1051e466190a2ea35f53e5c67d9268fb4000400e07bd1cbf9f006fbf4",
+          "sha1": "dd296acf884f278c33d262e757ccedbe402926af",
+          "md5": "cd68419d2a18356559957b0c0b0e27d2"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "org.slf4j",
+          "module": "slf4j-api",
+          "version": {
+            "requires": "1.7.30"
+          }
+        },
+        {
+          "group": "io.github.resilience4j",
+          "module": "resilience4j-core",
+          "version": {
+            "requires": "2.2.0"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "resilience4j-circuitbreaker-2.2.0.jar",
+          "url": "resilience4j-circuitbreaker-2.2.0.jar",
+          "size": 83023,
+          "sha512": "171eb0106c54ab6d6b5344378c6a2c48e065bb695db0e978212fdab8074c20f7d119b33e6b27a4567f904f57fe255e7f225befd672a1a65df569f1f2a58eb444",
+          "sha256": "b87b0de1051e466190a2ea35f53e5c67d9268fb4000400e07bd1cbf9f006fbf4",
+          "sha1": "dd296acf884f278c33d262e757ccedbe402926af",
+          "md5": "cd68419d2a18356559957b0c0b0e27d2"
+        }
+      ]
+    }
+  ]
+}

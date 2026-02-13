@@ -1,0 +1,85 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "io.github.resilience4j",
+    "module": "resilience4j-retry",
+    "version": "2.2.0",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "7.4.2"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "dependencies": [
+        {
+          "group": "io.github.resilience4j",
+          "module": "resilience4j-core",
+          "version": {
+            "requires": "2.2.0"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "resilience4j-retry-2.2.0.jar",
+          "url": "resilience4j-retry-2.2.0.jar",
+          "size": 48961,
+          "sha512": "ff934b9cfe4b719b705e3602c3870fe078ce03de960370da6b135a30e67601d9b3b510f661dc3ed5fc139d97beba68487f5ef7486fdcf736a8c69b486262a1b4",
+          "sha256": "5256badd000a3dfd74914241e7095adf96ccde955dabb9d204f1e7b60fe6bcba",
+          "sha1": "949e85e5501f75a54641276947143282ac13e102",
+          "md5": "919ae7605c46401d47fd30c8d11adbc6"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "org.slf4j",
+          "module": "slf4j-api",
+          "version": {
+            "requires": "1.7.30"
+          }
+        },
+        {
+          "group": "io.github.resilience4j",
+          "module": "resilience4j-core",
+          "version": {
+            "requires": "2.2.0"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "resilience4j-retry-2.2.0.jar",
+          "url": "resilience4j-retry-2.2.0.jar",
+          "size": 48961,
+          "sha512": "ff934b9cfe4b719b705e3602c3870fe078ce03de960370da6b135a30e67601d9b3b510f661dc3ed5fc139d97beba68487f5ef7486fdcf736a8c69b486262a1b4",
+          "sha256": "5256badd000a3dfd74914241e7095adf96ccde955dabb9d204f1e7b60fe6bcba",
+          "sha1": "949e85e5501f75a54641276947143282ac13e102",
+          "md5": "919ae7605c46401d47fd30c8d11adbc6"
+        }
+      ]
+    }
+  ]
+}

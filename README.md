@@ -34,7 +34,7 @@ Respuesta JSON → XML
 ## 📋 Requisitos
 
 - Java 17+
-- Maven 3.8+
+- Gradle 8+
 - Spring Boot 3.2+
 - Apache Camel 4.3+
 - Apache CXF 4.0+
@@ -49,7 +49,7 @@ cd D:\repositories\e-softslim02\soap-gateway
 
 ### 2. Configurar el archivo YAML
 
-Editar `src/main/resources/bridge-protocols.yml`:
+Editar `src/main/resources/application.yml` (y/o perfiles por ambiente):
 
 ```yaml
 bridge-protocols:
@@ -75,19 +75,19 @@ bridge-protocols:
 ### 3. Compilar
 
 ```bash
-mvn clean package
+gradle clean build
 ```
 
 ### 4. Ejecutar
 
 ```bash
-mvn spring-boot:run
+gradle bootRun
 ```
 
 O ejecutar el JAR:
 
 ```bash
-java -jar target/soap-gateway-1.0.0.jar
+java -jar build/libs/soap-gateway-1.0.0.jar
 ```
 
 ## 📝 Configuración YAML
@@ -171,11 +171,46 @@ Soporte para:
 - Encriptación (XML Encryption)
 - Timestamp validation
 
+Ejemplo `dev` (opcional):
+
+```bash
+export DEV_WS_SECURITY_ENABLED=true
+export DEV_WS_SECURITY_USERNAME=ws-user
+export DEV_WS_SECURITY_PASSWORD=ws-pass
+```
+
+Header SOAP con `UsernameToken`:
+
+```xml
+<soapenv:Header>
+  <wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
+    <wsse:UsernameToken>
+      <wsse:Username>ws-user</wsse:Username>
+      <wsse:Password>ws-pass</wsse:Password>
+    </wsse:UsernameToken>
+  </wsse:Security>
+</soapenv:Header>
+```
+
 ### Mutual TLS
 
 - Validación de certificados cliente
 - Configuración por entorno
 - Keystore y Truststore personalizables
+
+Ejemplo `dev` (opcional):
+
+```bash
+export DEV_MUTUAL_TLS_ENABLED=true
+export DEV_TLS_KEYSTORE_PATH=/ruta/dev-client-keystore.jks
+export DEV_TLS_KEYSTORE_PASSWORD=changeit
+export DEV_TLS_TRUSTSTORE_PATH=/ruta/dev-client-truststore.jks
+export DEV_TLS_TRUSTSTORE_PASSWORD=changeit
+```
+
+Para pruebas locales, puedes usar los archivos de ejemplo del proyecto:
+- `src/test/resources/certs/test-client-keystore.jks`
+- `src/test/resources/certs/test-client-truststore.jks`
 
 ## 🛡️ Resiliencia
 
@@ -316,7 +351,7 @@ soap-gateway/
 │   │   │       └── OAuth2TokenManager.java
 │   │   └── resources/
 │   │       ├── application.yml
-│   │       └── bridge-protocols.yml
+│   │       └── application.yml
 │   └── test/
 └── pom.xml
 ```
@@ -329,15 +364,15 @@ soap-gateway/
 - ✅ OAuth2 Client Credentials
 - ✅ Retry y Circuit Breaker
 - ✅ Observabilidad básica
-- ⚠️ WS-Security (en desarrollo)
-- ⚠️ Mutual TLS (en desarrollo)
+- ✅ WS-Security opcional por configuración
+- ✅ Mutual TLS opcional por configuración
 - 📋 Hot reload de configuración (pendiente)
 
 ## 🤝 Contribución
 
 Para agregar nuevos servicios:
 
-1. Editar `bridge-protocols.yml`
+1. Editar `application.yml` o `application-<ambiente>.yml`
 2. Reiniciar aplicación
 3. ¡Listo! No se requieren cambios de código
 
