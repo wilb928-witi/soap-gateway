@@ -1,0 +1,23 @@
+{
+  "priority": 1,
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/api/clientes/endpoint1/[^/]+",
+    "headers": {
+      "X-Mock-Variant": {
+        "equalTo": "timeout"
+      }
+    }
+  },
+  "response": {
+    "status": 504,
+    "fixedDelayMilliseconds": 7000,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "code": "TIMEOUT",
+      "message": "timeout simulado"
+    }
+  }
+}

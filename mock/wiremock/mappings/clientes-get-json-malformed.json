@@ -1,0 +1,21 @@
+{
+  "priority": 1,
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/api/clientes/endpoint1/[^/]+",
+    "headers": {
+      "X-Mock-Variant": {
+        "equalTo": "json-malformed"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Api-Trace": "trace-json-malformed",
+      "X-Api-Status": "OK"
+    },
+    "body": "{\"id\":\"{{request.pathSegments.[3]}}\",\"nombre\":"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "priority": 1,
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/api/clientes/endpoint1/[^/]+",
+    "headers": {
+      "X-Mock-Variant": {
+        "equalTo": "binary-ok"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/octet-stream",
+      "X-Api-Trace": "trace-binary-ok",
+      "X-Api-Status": "OK"
+    },
+    "base64Body": "AAECAwQFBgc="
+  }
+}

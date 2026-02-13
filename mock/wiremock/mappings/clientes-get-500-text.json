@@ -1,0 +1,21 @@
+{
+  "priority": 1,
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/api/clientes/endpoint1/[^/]+",
+    "headers": {
+      "X-Mock-Variant": {
+        "equalTo": "error-500-text"
+      }
+    }
+  },
+  "response": {
+    "status": 500,
+    "headers": {
+      "Content-Type": "text/plain",
+      "X-Api-Trace": "trace-error-500-text",
+      "X-Api-Status": "ERROR"
+    },
+    "body": "backend failure in core-client-service"
+  }
+}

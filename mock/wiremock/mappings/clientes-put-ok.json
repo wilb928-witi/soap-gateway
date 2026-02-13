@@ -1,0 +1,16 @@
+{
+  "priority": 50,
+  "request": {
+    "method": "PUT",
+    "urlPathPattern": "/api/clientes/endpoint1/[^/]+"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Api-Trace": "trace-put-ok",
+      "X-Api-Status": "OK"
+    },
+    "body": "{\"result\":\"updated\",\"id\":\"{{request.pathSegments.[3]}}\"}"
+  }
+}

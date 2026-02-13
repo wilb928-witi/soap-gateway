@@ -1,0 +1,21 @@
+{
+  "priority": 1,
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/api/clientes/endpoint1/[^/]+",
+    "headers": {
+      "X-Mock-Variant": {
+        "equalTo": "xml-ok"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/xml",
+      "X-Api-Trace": "trace-xml-ok",
+      "X-Api-Status": "OK"
+    },
+    "body": "<cliente><id>{{request.pathSegments.[3]}}</id><nombre>Cliente XML</nombre></cliente>"
+  }
+}

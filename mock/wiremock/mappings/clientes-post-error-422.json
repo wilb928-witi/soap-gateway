@@ -1,0 +1,24 @@
+{
+  "priority": 1,
+  "request": {
+    "method": "POST",
+    "urlPath": "/api/clientes/endpoint2",
+    "headers": {
+      "X-Mock-Variant": {
+        "equalTo": "error-422-json"
+      }
+    }
+  },
+  "response": {
+    "status": 422,
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Api-Trace": "trace-post-422",
+      "X-Api-Status": "ERROR"
+    },
+    "jsonBody": {
+      "code": "CLI-422",
+      "message": "Entidad inválida"
+    }
+  }
+}

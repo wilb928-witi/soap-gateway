@@ -80,6 +80,7 @@ class SoapGatewayApplicationTests {
             "<soapenv:Body>" +
             "<cli:getCliente>" +
             "<clienteId>12345</clienteId>" +
+            "<header><channel>MOBILE</channel></header>" +
             "</cli:getCliente>" +
             "</soapenv:Body>" +
             "</soapenv:Envelope>";
@@ -94,11 +95,15 @@ class SoapGatewayApplicationTests {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertTrue(response.getBody().contains("getClienteResponse"));
+        assertTrue(response.getBody().contains("<success>true</success>"));
+        assertTrue(response.getBody().contains("<statusCode>200</statusCode>"));
+        assertTrue(response.getBody().contains("<dataRedeable>true</dataRedeable>"));
         assertTrue(response.getBody().contains("<id>12345</id>"));
 
         RecordedRequest recordedRequest = backendServer.takeRequest();
         assertEquals("GET", recordedRequest.getMethod());
         assertTrue(recordedRequest.getPath().startsWith("/api/clientes/endpoint1/12345"));
+        assertEquals("MOBILE", recordedRequest.getHeader("X-Channel"));
     }
 
     @Test
@@ -129,7 +134,7 @@ class SoapGatewayApplicationTests {
             "xmlns:cli=\"http://softslim.com/gateway/clienteService\">" +
             "<soapenv:Header/>" +
             "<soapenv:Body>" +
-            "<cli:getCliente><clienteId>12345</clienteId></cli:getCliente>" +
+            "<cli:getCliente><clienteId>12345</clienteId><header><channel>MOBILE</channel></header></cli:getCliente>" +
             "</soapenv:Body>" +
             "</soapenv:Envelope>";
 
@@ -141,6 +146,9 @@ class SoapGatewayApplicationTests {
             String.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertTrue(response.getBody().contains("<success>true</success>"));
+        assertTrue(response.getBody().contains("<statusCode>200</statusCode>"));
+        assertTrue(response.getBody().contains("<dataRedeable>true</dataRedeable>"));
         assertTrue(response.getBody().contains("<id>12345</id>"));
 
         backendServer.takeRequest();
@@ -155,7 +163,7 @@ class SoapGatewayApplicationTests {
             "<?xml version=\"1.0\"?>" +
             "<!DOCTYPE foo [<!ENTITY xxe SYSTEM \"file:///etc/passwd\">]>" +
             "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:cli=\"http://softslim.com/gateway/clienteService\">" +
-            "<soapenv:Body><cli:getCliente><clienteId>&xxe;</clienteId></cli:getCliente></soapenv:Body>" +
+            "<soapenv:Body><cli:getCliente><clienteId>&xxe;</clienteId><header><channel>MOBILE</channel></header></cli:getCliente></soapenv:Body>" +
             "</soapenv:Envelope>";
 
         HttpHeaders headers = new HttpHeaders();
@@ -167,7 +175,8 @@ class SoapGatewayApplicationTests {
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertTrue(response.getBody().contains("<soap:Fault>"));
+        assertTrue(response.getBody().contains("<success>false</success>"));
+        assertTrue(response.getBody().contains("<statusCode>0</statusCode>"));
 
         DocumentBuilderFactory.newInstance()
             .newDocumentBuilder()

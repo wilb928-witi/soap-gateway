@@ -1,0 +1,21 @@
+{
+  "priority": 1,
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/api/clientes/endpoint1/[^/]+",
+    "headers": {
+      "X-Mock-Variant": {
+        "equalTo": "error-500-html"
+      }
+    }
+  },
+  "response": {
+    "status": 500,
+    "headers": {
+      "Content-Type": "text/html",
+      "X-Api-Trace": "trace-error-500-html",
+      "X-Api-Status": "ERROR"
+    },
+    "body": "<html><body><h1>Internal Error</h1><p>mock backend</p></body></html>"
+  }
+}

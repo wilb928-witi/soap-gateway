@@ -1,0 +1,16 @@
+{
+  "priority": 100,
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/api/clientes/endpoint1/[^/]+"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Api-Trace": "trace-json-ok",
+      "X-Api-Status": "OK"
+    },
+    "body": "{\"id\":\"{{request.pathSegments.[3]}}\",\"nombre\":\"Cliente Mock\",\"channel\":\"{{request.headers.X-Channel}}\",\"clienteHeader\":\"{{request.headers.X-Cliente-Id}}\"}"
+  }
+}

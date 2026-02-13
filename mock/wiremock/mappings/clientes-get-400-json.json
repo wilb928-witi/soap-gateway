@@ -1,0 +1,25 @@
+{
+  "priority": 1,
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/api/clientes/endpoint1/[^/]+",
+    "headers": {
+      "X-Mock-Variant": {
+        "equalTo": "error-400-json"
+      }
+    }
+  },
+  "response": {
+    "status": 400,
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Api-Trace": "trace-error-400",
+      "X-Api-Status": "ERROR"
+    },
+    "jsonBody": {
+      "code": "CLI-400",
+      "message": "Solicitud inválida",
+      "detail": "clienteId no cumple formato"
+    }
+  }
+}

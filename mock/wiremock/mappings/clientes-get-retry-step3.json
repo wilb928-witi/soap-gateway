@@ -1,0 +1,23 @@
+{
+  "priority": 1,
+  "scenarioName": "cliente-retry",
+  "requiredScenarioState": "THIRD_ATTEMPT",
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/api/clientes/endpoint1/[^/]+",
+    "headers": {
+      "X-Mock-Variant": {
+        "equalTo": "retry-then-ok"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Api-Trace": "trace-retry-success",
+      "X-Api-Status": "OK"
+    },
+    "body": "{\"id\":\"{{request.pathSegments.[3]}}\",\"nombre\":\"Cliente Retry OK\"}"
+  }
+}

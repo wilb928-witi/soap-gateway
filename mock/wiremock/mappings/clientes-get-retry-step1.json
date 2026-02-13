@@ -1,0 +1,25 @@
+{
+  "priority": 1,
+  "scenarioName": "cliente-retry",
+  "requiredScenarioState": "Started",
+  "newScenarioState": "SECOND_ATTEMPT",
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/api/clientes/endpoint1/[^/]+",
+    "headers": {
+      "X-Mock-Variant": {
+        "equalTo": "retry-then-ok"
+      }
+    }
+  },
+  "response": {
+    "status": 500,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "code": "TEMP-1",
+      "message": "falla transitoria 1"
+    }
+  }
+}

@@ -1,5 +1,6 @@
 package com.softslim.gateway.service;
 
+import com.softslim.gateway.exception.ApiInvocationException;
 import com.softslim.gateway.model.BridgeConfiguration;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -58,10 +60,18 @@ public class RestInvocationService {
             ResponseEntity<String> response = requestSupplier.get();
             exchange.getIn().setBody(response.getBody() == null ? "{}" : response.getBody());
             exchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, response.getStatusCode().value());
+            exchange.setProperty("apiResponseContentType", response.getHeaders().getFirst("Content-Type"));
+        } catch (HttpStatusCodeException e) {
+            throw new ApiInvocationException(
+                e.getStatusCode().value(),
+                e.getResponseBodyAsString(),
+                e.getResponseHeaders() != null ? e.getResponseHeaders().getFirst("Content-Type") : null,
+                e
+            );
         } catch (CallNotPermittedException e) {
-            throw new IllegalStateException("Circuit breaker abierto para " + routeKey, e);
+            throw ApiInvocationException.internal("Circuit breaker abierto para " + routeKey, e);
         } catch (RestClientException e) {
-            throw new IllegalStateException("Error invocando backend REST: " + e.getMessage(), e);
+            throw ApiInvocationException.internal("Error invocando backend REST: " + e.getMessage(), e);
         }
     }
 

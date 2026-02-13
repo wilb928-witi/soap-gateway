@@ -1,0 +1,19 @@
+{
+  "priority": 50,
+  "request": {
+    "method": "POST",
+    "urlPath": "/api/clientes/endpoint2"
+  },
+  "response": {
+    "status": 201,
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Api-Trace": "trace-post-created",
+      "X-Api-Status": "OK"
+    },
+    "jsonBody": {
+      "result": "created",
+      "id": "C-1000"
+    }
+  }
+}

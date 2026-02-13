@@ -1,0 +1,21 @@
+{
+  "priority": 1,
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/api/empleados/[^/]+",
+    "headers": {
+      "X-Mock-Variant": {
+        "equalTo": "error-404-text"
+      }
+    }
+  },
+  "response": {
+    "status": 404,
+    "headers": {
+      "Content-Type": "text/plain",
+      "X-Api-Trace": "trace-emp-404",
+      "X-Api-Status": "ERROR"
+    },
+    "body": "empleado no encontrado"
+  }
+}

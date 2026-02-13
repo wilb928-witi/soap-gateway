@@ -1,0 +1,19 @@
+{
+  "priority": 1,
+  "request": {
+    "method": "PUT",
+    "urlPathPattern": "/api/clientes/endpoint1/[^/]+",
+    "headers": {
+      "X-Mock-Variant": {
+        "equalTo": "no-content"
+      }
+    }
+  },
+  "response": {
+    "status": 204,
+    "headers": {
+      "X-Api-Trace": "trace-put-204",
+      "X-Api-Status": "OK"
+    }
+  }
+}

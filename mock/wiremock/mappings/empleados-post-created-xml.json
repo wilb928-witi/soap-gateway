@@ -1,0 +1,16 @@
+{
+  "priority": 100,
+  "request": {
+    "method": "POST",
+    "urlPath": "/api/empleados/"
+  },
+  "response": {
+    "status": 201,
+    "headers": {
+      "Content-Type": "application/xml",
+      "X-Api-Trace": "trace-emp-post",
+      "X-Api-Status": "OK"
+    },
+    "body": "<resultado><status>created</status><id>E-1000</id></resultado>"
+  }
+}

@@ -1,8 +1,8 @@
 package com.softslim.gateway.routes;
 
 import com.softslim.gateway.model.BridgeConfiguration;
-import com.softslim.gateway.processor.JsonToXmlProcessor;
 import com.softslim.gateway.processor.SoapFaultProcessor;
+import com.softslim.gateway.service.ApiDataFormatter;
 import com.softslim.gateway.service.OAuth2TokenService;
 import com.softslim.gateway.service.RestInvocationService;
 import com.softslim.gateway.service.WsdlContractService;
@@ -20,9 +20,9 @@ import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.StringReader;
 import java.util.LinkedHashMap;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,26 +30,27 @@ import java.util.regex.Pattern;
 @Component
 public class DynamicBridgeRouteBuilder extends RouteBuilder {
     private static final Pattern HEADER_PLACEHOLDER = Pattern.compile("\\$\\{header\\.([^}]+)}");
+    private static final Pattern SOAP_PLACEHOLDER = Pattern.compile("\\$\\{soap\\.([^}]+)}");
 
     private final BridgeConfiguration bridgeConfig;
-    private final JsonToXmlProcessor jsonToXmlProcessor;
     private final SoapFaultProcessor soapFaultProcessor;
     private final OAuth2TokenService oAuth2TokenService;
     private final WsdlContractService wsdlContractService;
     private final RestInvocationService restInvocationService;
+    private final ApiDataFormatter apiDataFormatter;
 
     public DynamicBridgeRouteBuilder(BridgeConfiguration bridgeConfig,
-                                      JsonToXmlProcessor jsonToXmlProcessor,
                                       SoapFaultProcessor soapFaultProcessor,
                                       OAuth2TokenService oAuth2TokenService,
                                       WsdlContractService wsdlContractService,
-                                      RestInvocationService restInvocationService) {
+                                      RestInvocationService restInvocationService,
+                                      ApiDataFormatter apiDataFormatter) {
         this.bridgeConfig = bridgeConfig;
-        this.jsonToXmlProcessor = jsonToXmlProcessor;
         this.soapFaultProcessor = soapFaultProcessor;
         this.oAuth2TokenService = oAuth2TokenService;
         this.wsdlContractService = wsdlContractService;
         this.restInvocationService = restInvocationService;
+        this.apiDataFormatter = apiDataFormatter;
     }
 
     @Override
@@ -84,11 +85,13 @@ public class DynamicBridgeRouteBuilder extends RouteBuilder {
 
         from("servlet:" + soapPath + "?httpMethodRestrict=GET")
             .routeId(wsdlRouteId)
+            .process(this::ensureCorrelationId)
             .process(exchange -> buildWsdlResponse(exchange, serviceName, endpointClient, soapPath));
 
         from("servlet:" + soapPath + "?httpMethodRestrict=POST")
             .routeId("soap-in-" + serviceName)
             .convertBodyTo(String.class)
+            .process(this::ensureCorrelationId)
             .to("direct:" + internalSoapEntryRouteId);
 
         from("direct:" + internalSoapEntryRouteId)
@@ -134,7 +137,6 @@ public class DynamicBridgeRouteBuilder extends RouteBuilder {
             .process(exchange -> prepareRestInvocation(exchange, endpointClient, restPath))
             .process(restInvocationService::invoke)
             .convertBodyTo(String.class)
-            .process(jsonToXmlProcessor)
             .process(this::buildSoapSuccessResponse)
             .log("Respuesta SOAP generada para operación: " + restPath.getOperation());
     }
@@ -161,7 +163,12 @@ public class DynamicBridgeRouteBuilder extends RouteBuilder {
         Map<String, String> outboundHeaders = new LinkedHashMap<>();
 
         if (restPath.getHeaders() != null) {
-            outboundHeaders.putAll(restPath.getHeaders());
+            restPath.getHeaders().forEach((key, value) -> {
+                String resolved = resolveTemplate(value, exchange, false);
+                if (resolved != null) {
+                    outboundHeaders.put(key, resolved);
+                }
+            });
         }
 
         applySecurity(exchange, endpointClient, outboundHeaders);
@@ -172,7 +179,7 @@ public class DynamicBridgeRouteBuilder extends RouteBuilder {
         if (isBodyMethod(method)) {
             Object paramsObject = exchange.getProperty("SoapParameters");
             @SuppressWarnings("unchecked")
-            Map<String, String> params = paramsObject instanceof Map ? (Map<String, String>) paramsObject : Map.of();
+            Map<String, Object> params = paramsObject instanceof Map ? (Map<String, Object>) paramsObject : Map.of();
             String requestBody = new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(params);
             exchange.getIn().setBody(requestBody);
             exchange.getIn().setHeader(Exchange.CONTENT_TYPE, "application/json");
@@ -251,20 +258,8 @@ public class DynamicBridgeRouteBuilder extends RouteBuilder {
         exchange.getIn().setHeader("SoapOperation", operationName);
         exchange.getIn().setHeader("SoapNamespace", operationElement.getNamespaceURI());
 
-        Map<String, String> parameters = new HashMap<>();
-        NodeList children = operationElement.getChildNodes();
-        for (int i = 0; i < children.getLength(); i++) {
-            Node child = children.item(i);
-            if (child.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-
-            String key = child.getLocalName() != null ? child.getLocalName() : child.getNodeName();
-            String value = child.getTextContent();
-            parameters.put(key, value);
-            exchange.getIn().setHeader(key, value);
-        }
-
+        Map<String, Object> parameters = new LinkedHashMap<>();
+        extractNestedParameters(operationElement, "", exchange, parameters);
         exchange.setProperty("SoapParameters", parameters);
     }
 
@@ -306,25 +301,45 @@ public class DynamicBridgeRouteBuilder extends RouteBuilder {
     }
 
     private void buildSoapSuccessResponse(Exchange exchange) {
-        String xmlFragment = exchange.getIn().getBody(String.class);
+        String rawData = exchange.getIn().getBody(String.class);
+        String apiContentType = exchange.getProperty("apiResponseContentType", String.class);
+        ApiDataFormatter.FormattedData formattedData = apiDataFormatter.format(rawData, apiContentType);
+        int statusCode = exchange.getIn().getHeader(Exchange.HTTP_RESPONSE_CODE, 200, Integer.class);
+        boolean success = statusCode >= 200 && statusCode <= 299;
         String operationName = exchange.getIn().getHeader("SoapOperation", String.class);
         String namespace = exchange.getIn().getHeader("SoapNamespace", String.class);
         if (namespace == null || namespace.isBlank()) {
             namespace = "http://softslim.com/gateway";
         }
 
+        String dataNode = formattedData.xmlPayload()
+            ? formattedData.payload()
+            : apiDataFormatter.escapeXml(formattedData.payload());
+
         String soapResponse =
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
             "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
             "  <soap:Body>" +
             "    <ns:" + operationName + "Response xmlns:ns=\"" + escapeXml(namespace) + "\">" +
-            xmlFragment +
+            "      <success>" + success + "</success>" +
+            "      <statusCode>" + statusCode + "</statusCode>" +
+            "      <dataRedeable>" + formattedData.dataRedeable() + "</dataRedeable>" +
+            "      <data>" + dataNode + "</data>" +
             "    </ns:" + operationName + "Response>" +
             "  </soap:Body>" +
             "</soap:Envelope>";
 
         exchange.getIn().setBody(soapResponse);
         exchange.getIn().setHeader(Exchange.CONTENT_TYPE, "text/xml");
+    }
+
+    private void ensureCorrelationId(Exchange exchange) {
+        String correlationId = exchange.getIn().getHeader("CorrelationId", String.class);
+        if (correlationId == null || correlationId.isBlank()) {
+            correlationId = UUID.randomUUID().toString();
+            exchange.getIn().setHeader("CorrelationId", correlationId);
+        }
+        exchange.setProperty("CorrelationId", correlationId);
     }
 
     private void buildWsdlResponse(
@@ -363,18 +378,84 @@ public class DynamicBridgeRouteBuilder extends RouteBuilder {
             return "";
         }
 
-        Matcher matcher = HEADER_PLACEHOLDER.matcher(path);
+        return resolveTemplate(path, exchange, true);
+    }
+
+    private String resolveTemplate(String template, Exchange exchange, boolean required) {
+        if (template == null) {
+            return "";
+        }
+
+        String withSoap = replacePlaceholders(template, SOAP_PLACEHOLDER, exchange, required);
+        if (withSoap == null) {
+            return null;
+        }
+        String withHeader = replacePlaceholders(withSoap, HEADER_PLACEHOLDER, exchange, required);
+        return withHeader;
+    }
+
+    private String replacePlaceholders(
+        String template,
+        Pattern pattern,
+        Exchange exchange,
+        boolean required
+    ) {
+        Matcher matcher = pattern.matcher(template);
         StringBuilder resolved = new StringBuilder();
         while (matcher.find()) {
             String headerName = matcher.group(1);
             Object value = exchange.getIn().getHeader(headerName);
             if (value == null) {
-                throw new IllegalArgumentException("Header requerido no encontrado para path REST: " + headerName);
+                if (required) {
+                    throw new IllegalArgumentException("Header requerido no encontrado para path REST: " + headerName);
+                }
+                return null;
             }
             matcher.appendReplacement(resolved, Matcher.quoteReplacement(value.toString()));
         }
         matcher.appendTail(resolved);
         return resolved.toString();
+    }
+
+    private void extractNestedParameters(
+        Element parent,
+        String prefix,
+        Exchange exchange,
+        Map<String, Object> target
+    ) {
+        NodeList children = parent.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if (child.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            Element element = (Element) child;
+            String key = element.getLocalName() != null ? element.getLocalName() : element.getNodeName();
+            String fullKey = prefix.isBlank() ? key : prefix + "." + key;
+
+            if (hasElementChildren(element)) {
+                Map<String, Object> nested = new LinkedHashMap<>();
+                extractNestedParameters(element, fullKey, exchange, nested);
+                target.put(key, nested);
+                continue;
+            }
+
+            String value = element.getTextContent();
+            target.put(key, value);
+            exchange.getIn().setHeader(key, value);
+            exchange.getIn().setHeader(fullKey, value);
+        }
+    }
+
+    private boolean hasElementChildren(Element element) {
+        NodeList childNodes = element.getChildNodes();
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            if (childNodes.item(i).getNodeType() == Node.ELEMENT_NODE) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private String buildTargetUrl(String domainPath, String path) {

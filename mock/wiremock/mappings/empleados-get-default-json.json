@@ -1,0 +1,16 @@
+{
+  "priority": 100,
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/api/empleados/[^/]+"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Api-Trace": "trace-emp-get",
+      "X-Api-Status": "OK"
+    },
+    "body": "{\"id\":\"{{request.pathSegments.[2]}}\",\"nombre\":\"Empleado Mock\"}"
+  }
+}

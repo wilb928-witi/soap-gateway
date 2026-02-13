@@ -6,6 +6,8 @@ server:
 spring:
   application:
     name: soap-gateway
+  profiles:
+    default: dev
   config:
     import: optional:file:.env[.properties]
 

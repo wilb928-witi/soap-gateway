@@ -1,0 +1,21 @@
+{
+  "priority": 1,
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/api/clientes/endpoint1/[^/]+",
+    "headers": {
+      "X-Mock-Variant": {
+        "equalTo": "text-ok"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "text/plain",
+      "X-Api-Trace": "trace-text-ok",
+      "X-Api-Status": "OK"
+    },
+    "body": "cliente={{request.pathSegments.[3]}}|estado=activo"
+  }
+}

@@ -79,7 +79,7 @@ class MutualTlsIntegrationTests {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
             "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:cli=\"http://softslim.com/gateway/clienteService\">" +
             "<soapenv:Header/>" +
-            "<soapenv:Body><cli:getCliente><clienteId>200</clienteId></cli:getCliente></soapenv:Body>" +
+            "<soapenv:Body><cli:getCliente><clienteId>200</clienteId><header><channel>MOBILE</channel></header></cli:getCliente></soapenv:Body>" +
             "</soapenv:Envelope>";
 
         HttpHeaders headers = new HttpHeaders();
@@ -90,6 +90,9 @@ class MutualTlsIntegrationTests {
             String.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertTrue(response.getBody().contains("<success>true</success>"));
+        assertTrue(response.getBody().contains("<statusCode>200</statusCode>"));
+        assertTrue(response.getBody().contains("<dataRedeable>true</dataRedeable>"));
         assertTrue(response.getBody().contains("<id>200</id>"));
     }
 }
