@@ -1,0 +1,138 @@
+spring:
+  config:
+    activate:
+      on-profile: mock
+
+logging:
+  level:
+    com.softslim.gateway: DEBUG
+    org.apache.camel: DEBUG
+
+bridge-protocols:
+  version: "1.0"
+  global-resilience:
+    retry:
+      enabled: false
+      maxAttempts: 3
+      backoff: 1000
+    circuitBreaker:
+      enabled: false
+      failureRateThreshold: 50
+      waitDurationInOpenState: 10000
+      slidingWindowSize: 10
+  endpoints-clients:
+    clienteService:
+      version: v1
+      soap-path: /soap/clienteService
+      routing:
+        strategy: operation-name
+      rest:
+        domain-path: ${CLIENTE_SERVICE_URL:http://localhost:18081/api/clientes}
+        paths:
+          - id: endpoint1
+            operation: getCliente
+            path: /endpoint1/${header.clienteId}
+            method: GET
+            timeout: 5000
+            headers:
+              Content-Type: application/json
+              Accept: application/json
+              X-Channel: ${soap.header.channel}
+              X-Mock-Variant: ${soap.header.variant}
+              X-Cliente-Id: ${header.clienteId}
+          - id: endpoint2
+            operation: crearCliente
+            path: /endpoint2
+            method: POST
+            timeout: 8000
+            headers:
+              Content-Type: application/json
+              Accept: application/json
+              X-Mock-Variant: ${soap.header.variant}
+          - id: endpoint3
+            operation: actualizarCliente
+            path: /endpoint1/${header.clienteId}
+            method: PUT
+            timeout: 6000
+            headers:
+              Content-Type: application/json
+              X-Mock-Variant: ${soap.header.variant}
+      security:
+        oauth2:
+          enabled: ${MOCK_OAUTH2_ENABLED:false}
+          client-id: ${MOCK_OAUTH2_CLIENT_ID:backend-client}
+          client-secret: ${MOCK_OAUTH2_CLIENT_SECRET:secret}
+          token-uri: ${MOCK_OAUTH2_TOKEN_URI:http://localhost:18081/oauth2/token}
+          scope: ${MOCK_OAUTH2_SCOPE:api.read api.write}
+        wsSecurity:
+          enabled: ${MOCK_WS_SECURITY_ENABLED:false}
+          username: ${MOCK_WS_SECURITY_USERNAME:}
+          password: ${MOCK_WS_SECURITY_PASSWORD:}
+        mutualTls:
+          enabled: ${MOCK_MUTUAL_TLS_ENABLED:false}
+          keystore-path: ${MOCK_TLS_KEYSTORE_PATH:}
+          keystore-password: ${MOCK_TLS_KEYSTORE_PASSWORD:}
+          truststore-path: ${MOCK_TLS_TRUSTSTORE_PATH:}
+          truststore-password: ${MOCK_TLS_TRUSTSTORE_PASSWORD:}
+      resilience:
+        retry:
+          enabled: true
+          maxAttempts: 3
+          backoff: 2000
+        circuitBreaker:
+          enabled: true
+          failureRateThreshold: 50
+          waitDurationInOpenState: 10000
+          slidingWindowSize: 10
+
+    empleadoService:
+      version: v1
+      soap-path: /soap/empleadoService
+      routing:
+        strategy: operation-name
+      rest:
+        domain-path: ${EMPLEADO_SERVICE_URL:http://localhost:18081/api/empleados}
+        paths:
+          - id: getEmpleado
+            operation: getEmpleado
+            path: /${header.empleadoId}
+            method: GET
+            timeout: 4000
+            headers:
+              Content-Type: application/json
+              X-Mock-Variant: ${soap.header.variant}
+          - id: crearEmpleado
+            operation: crearEmpleado
+            path: /
+            method: POST
+            timeout: 5000
+            headers:
+              Content-Type: application/json
+              X-Mock-Variant: ${soap.header.variant}
+      security:
+        oauth2:
+          enabled: ${MOCK_OAUTH2_ENABLED:false}
+          client-id: ${MOCK_OAUTH2_CLIENT_ID:backend-client}
+          client-secret: ${MOCK_OAUTH2_CLIENT_SECRET:secret}
+          token-uri: ${MOCK_OAUTH2_TOKEN_URI:http://localhost:18081/oauth2/token}
+          scope: ${MOCK_OAUTH2_SCOPE:api.read api.write}
+        wsSecurity:
+          enabled: ${MOCK_WS_SECURITY_ENABLED:false}
+          username: ${MOCK_WS_SECURITY_USERNAME:}
+          password: ${MOCK_WS_SECURITY_PASSWORD:}
+        mutualTls:
+          enabled: ${MOCK_MUTUAL_TLS_ENABLED:false}
+          keystore-path: ${MOCK_TLS_KEYSTORE_PATH:}
+          keystore-password: ${MOCK_TLS_KEYSTORE_PASSWORD:}
+          truststore-path: ${MOCK_TLS_TRUSTSTORE_PATH:}
+          truststore-password: ${MOCK_TLS_TRUSTSTORE_PASSWORD:}
+      resilience:
+        retry:
+          enabled: true
+          maxAttempts: 3
+          backoff: 1500
+        circuitBreaker:
+          enabled: true
+          failureRateThreshold: 60
+          waitDurationInOpenState: 8000
+          slidingWindowSize: 10
